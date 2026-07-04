@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "FlexWeb",
+  "description": "Customize, fix, and enhance websites with AI-generated persistent modifications.",
+  "version": "0.1.0",
+  "action": {
+    "default_title": "FlexWeb",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "options_page": "options.html",
+  "permissions": ["activeTab", "storage", "sidePanel", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
