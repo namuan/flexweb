@@ -25,7 +25,7 @@ function SidePanel(): ReactElement {
   const [prompt, setPrompt] = useState('Hide distracting sidebars and make the article easier to read.');
   const [context, setContext] = useState<PageContext | null>(null);
   const [contextMode, setContextMode] = useState<ContextMode>('page');
-  const [consent, setConsent] = useState(false);
+  const [consent, setConsent] = useState(true);
   const [generated, setGenerated] = useState<GeneratedModification | null>(null);
   const [mods, setMods] = useState<Modification[]>([]);
   const [activeUrl, setActiveUrl] = useState<string>();
@@ -70,7 +70,7 @@ function SidePanel(): ReactElement {
     try {
       setTargetElement(await startElementPicker());
       setContextMode('page');
-      setConsent(false);
+      setConsent(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
     } finally {
@@ -80,7 +80,7 @@ function SidePanel(): ReactElement {
 
   async function clearTargetElement(): Promise<void> {
     setTargetElement(null);
-    setConsent(false);
+    setConsent(true);
     await clearElementHighlight();
   }
 
@@ -114,7 +114,7 @@ function SidePanel(): ReactElement {
           value={prompt}
           onChange={(e) => {
             setPrompt(e.target.value);
-            setConsent(false);
+            setConsent(true);
           }}
           placeholder="Describe how this site should change..."
         />
@@ -124,7 +124,7 @@ function SidePanel(): ReactElement {
             value={contextMode}
             onChange={(e) => {
               setContextMode(e.target.value as ContextMode);
-              setConsent(false);
+              setConsent(true);
             }}
             disabled={Boolean(targetElement)}
           >
@@ -133,12 +133,14 @@ function SidePanel(): ReactElement {
             <option value="minimal">Minimal: URL and title only</option>
           </select>
         </label>
-        <div className="panel stack">
-          <strong>Privacy preview</strong>
-          <p className="tiny muted">{contextPreview}</p>
-          <label className="tiny muted">
-            <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} /> I approve sending this prompt and context to my
-            configured AI provider.
+        <div className="privacy-strip">
+          <div className="privacy-copy">
+            <strong>Privacy preview</strong>
+            <span>{contextPreview}</span>
+          </div>
+          <label className="consent-check">
+            <input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
+            <span>I approve sending this prompt and context to my configured AI provider.</span>
           </label>
         </div>
         <div className="row">
@@ -153,7 +155,7 @@ function SidePanel(): ReactElement {
             onClick={() =>
               getPageContext().then((page) => {
                 setContext(page);
-                setConsent(false);
+                setConsent(true);
               })
             }
           >

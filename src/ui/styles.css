@@ -107,6 +107,11 @@ select {
   color: inherit;
   font: inherit;
 }
+input[type='checkbox'] {
+  width: auto;
+  margin: 0;
+  accent-color: oklch(63% 0.11 72);
+}
 textarea {
   min-height: 116px;
   resize: vertical;
@@ -161,6 +166,38 @@ textarea {
   display: grid;
   gap: 12px;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+.privacy-strip {
+  display: grid;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid oklch(83% 0.035 78);
+  border-radius: 16px;
+  background: color-mix(in oklch, white 54%, oklch(93% 0.045 82));
+}
+.privacy-copy {
+  display: grid;
+  gap: 3px;
+}
+.privacy-copy strong {
+  font-size: 12px;
+}
+.privacy-copy span {
+  color: oklch(48% 0.03 70);
+  font-size: 11px;
+  line-height: 1.35;
+}
+.consent-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: oklch(37% 0.035 70);
+  font-size: 11px;
+  line-height: 1.35;
+}
+.consent-check input {
+  flex: 0 0 auto;
+  margin-top: 2px;
 }
 @media (max-width: 520px) {
   .side {
