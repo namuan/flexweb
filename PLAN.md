@@ -78,6 +78,62 @@ Defer the public community library, extension exporter, billing, and advanced we
   - `dailyCreditUsage`
   - `privacyMode`
 
+## Prioritized Remaining Work
+
+The remaining work should be tackled in this order. UX polish and developer/project quality tasks are intentionally lower priority than MVP safety, privacy, runtime reliability, and core product capability.
+
+### Priority 1: Safety and Runtime Reliability
+
+- [ ] Add static safety checks before JavaScript execution.
+- [ ] Highlight requested permissions and risky behaviors.
+- [ ] Block or warn on network exfiltration, credential access, destructive DOM actions, and broad page access.
+- [ ] Track modification execution results and errors in the UI/storage model.
+- [ ] Add emergency disable-all control.
+- [ ] Add rollback notes to structured AI output.
+
+### Priority 2: Privacy and Context Control
+
+- [ ] Add explicit per-request context consent UI before provider calls.
+- [ ] Add controls for selected-text-only context and no-context prompting.
+- [ ] Add in-product per-request privacy details before generation.
+- [ ] Add privacy indicators showing exactly what context is sent.
+
+### Priority 3: Core Product Expansion
+
+- [ ] Add general chat UI in the side panel.
+- [ ] Support page-aware questions using approved page context.
+- [ ] Support selected-text actions such as summarize, rewrite, translate, and explain.
+- [ ] Add input-field writing improvement flow.
+- [ ] Improve built-in library coverage with Writing helpers and Fun/novelty categories.
+- [ ] Add parameterized templates for common requests.
+
+### Priority 4: Platform and Launch Readiness
+
+- [ ] Add packaged extension/zip build command.
+- [ ] Revisit manifest permissions for least-privilege host access before store submission.
+- [ ] Detect PDF viewer pages and define supported PDF behavior.
+- [ ] Create onboarding flow explaining permissions, privacy, and BYOK setup.
+- [ ] Prepare Chrome Web Store listing assets.
+- [ ] Review Chrome Web Store policy compliance.
+
+### Priority 5: Lower-Priority UX Polish
+
+- [ ] Add search and filter actions for modifications.
+- [ ] Add duplicate and export actions for modifications.
+- [ ] Add true diff preview against previous versions.
+- [ ] Add version history or restore previous generated versions.
+- [ ] Add dedicated per-site management view from popup or side panel.
+- [ ] Add library search and category browsing.
+
+### Priority 6: Developer and Project Quality
+
+- [ ] Add linting and formatting.
+- [ ] Add unit tests for storage, matching, provider adapters, and output validation.
+- [ ] Add integration tests for extension message passing.
+- [ ] Add browser automation tests for applying modifications on sample pages.
+- [ ] Add manual QA checklist for generated modification safety.
+- [ ] Create release checklist and versioning process.
+
 ## Task List
 
 ### Phase 1: Project Foundation
@@ -155,7 +211,7 @@ Defer the public community library, extension exporter, billing, and advanced we
 - [ ] Add emergency disable-all control.
 - [ ] Add import/export format with warning labels for untrusted modifications.
 
-### Phase 7: Modification Management UI
+### Phase 7: Modification Management UI (Lower-Priority UX Polish)
 
 - [x] Build installed modifications list.
 - [x] Add enable, disable, edit, regenerate, and delete actions.
@@ -219,7 +275,7 @@ Defer the public community library, extension exporter, billing, and advanced we
 - [ ] Add usage tracking for free daily credits if hosted AI is introduced.
 - [x] Design account, subscription, and billing integration only after MVP validation.
 
-### Phase 13: Testing and Quality Assurance
+### Phase 13: Testing and Quality Assurance (Later Developer/Project Quality)
 
 - [ ] Add unit tests for storage, matching, provider adapters, and output validation.
 - [ ] Add integration tests for extension message passing.
