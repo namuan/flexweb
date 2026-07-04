@@ -93,10 +93,10 @@ The remaining work should be tackled in this order. UX polish and developer/proj
 
 ### Priority 2: Privacy and Context Control
 
-- [ ] Add explicit per-request context consent UI before provider calls.
-- [ ] Add controls for selected-text-only context and no-context prompting.
-- [ ] Add in-product per-request privacy details before generation.
-- [ ] Add privacy indicators showing exactly what context is sent.
+- [x] Add explicit per-request context consent UI before provider calls.
+- [x] Add controls for selected-text-only context and no-context prompting.
+- [x] Add in-product per-request privacy details before generation.
+- [x] Add privacy indicators showing exactly what context is sent.
 
 ### Priority 3: Core Product Expansion
 
@@ -168,8 +168,8 @@ The remaining work should be tackled in this order. UX polish and developer/proj
 - [x] Avoid collecting sensitive fields by default, including passwords, payment fields, tokens, and private form values.
 - [x] Add DevTools-style element picker for deliberate target-element selection.
 - [x] Send page context only as part of a user-initiated generation/regeneration action.
-- [ ] Add explicit per-request context consent UI before provider calls.
-- [ ] Add controls for selected-text-only context and no-context prompting.
+- [x] Add explicit per-request context consent UI before provider calls.
+- [x] Add controls for selected-text-only context and no-context prompting.
 - [x] Define basic page context size limits and summarization rules.
 
 ### Phase 4: AI Prompt-to-Modification Pipeline
@@ -244,7 +244,7 @@ The remaining work should be tackled in this order. UX polish and developer/proj
 - [ ] Support selected-text actions such as summarize, rewrite, translate, and explain.
 - [ ] Add input-field writing improvement flow.
 - [ ] Let users insert AI-generated text back into focused inputs with confirmation.
-- [ ] Add privacy indicators showing exactly what context is sent.
+- [x] Add privacy indicators showing exactly what context is sent.
 - [x] Defer full web search until core chat and page context are stable.
 
 ### Phase 10: PDFs and Non-Standard Pages
@@ -271,7 +271,7 @@ The remaining work should be tackled in this order. UX polish and developer/proj
 - [x] Add no-history-by-default behavior for chats and page context.
 - [ ] Add optional local chat history setting.
 - [x] Add basic privacy copy for API keys and provider requests in README/options/security docs.
-- [ ] Add in-product per-request privacy details before generation.
+- [x] Add in-product per-request privacy details before generation.
 - [ ] Add usage tracking for free daily credits if hosted AI is introduced.
 - [x] Design account, subscription, and billing integration only after MVP validation.
 
