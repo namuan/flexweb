@@ -2,6 +2,7 @@ import type { Modification, PageContext, RuntimeMessage, SelectedElement } from 
 
 const STYLE_PREFIX = 'flexweb-style-';
 let activeIds = new Set<string>();
+let selectedHighlight: { overlay: HTMLDivElement; label: HTMLDivElement; selector: string; intervalId: number } | null = null;
 
 chrome.runtime.onMessage.addListener((message: RuntimeMessage, _sender, sendResponse) => {
   try {
@@ -10,6 +11,14 @@ chrome.runtime.onMessage.addListener((message: RuntimeMessage, _sender, sendResp
       startElementPicker().then((element) => sendResponse({ ok: true, element })).catch((error: unknown) => {
         sendResponse({ ok: false, error: error instanceof Error ? error.message : String(error) });
       });
+    }
+    if (message.type === 'HIGHLIGHT_SELECTED_ELEMENT') {
+      highlightSelectedElement(message.selector);
+      sendResponse({ ok: true });
+    }
+    if (message.type === 'CLEAR_ELEMENT_HIGHLIGHT') {
+      clearSelectedHighlight();
+      sendResponse({ ok: true });
     }
     if (message.type === 'APPLY_MODIFICATIONS') {
       applyModifications(message.modifications);
@@ -124,6 +133,7 @@ function describeElement(element: Element): SelectedElement {
 
 function startElementPicker(): Promise<SelectedElement> {
   return new Promise((resolve, reject) => {
+    clearSelectedHighlight();
     const overlay = document.createElement('div');
     const label = document.createElement('div');
     const blocker = document.createElement('div');
@@ -174,7 +184,11 @@ function startElementPicker(): Promise<SelectedElement> {
       const selected = current ?? elementFromPoint(event);
       cleanup();
       if (!selected) reject(new Error('No selectable element was picked.'));
-      else resolve(describeElement(selected));
+      else {
+        const description = describeElement(selected);
+        highlightSelectedElement(description.selector);
+        resolve(description);
+      }
     };
 
     const onKeyDown = (event: KeyboardEvent): void => {
@@ -189,6 +203,44 @@ function startElementPicker(): Promise<SelectedElement> {
     blocker.addEventListener('click', onClick, true);
     window.addEventListener('keydown', onKeyDown, true);
   });
+}
+
+function highlightSelectedElement(selector: string): void {
+  clearSelectedHighlight();
+  const element = document.querySelector(selector);
+  if (!element) return;
+  const overlay = document.createElement('div');
+  const label = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;z-index:2147483645;pointer-events:none;border:2px solid #f59e0b;background:rgba(245,158,11,.18);box-shadow:0 0 0 1px rgba(17,24,39,.35),0 8px 30px rgba(245,158,11,.35);border-radius:3px;';
+  label.style.cssText = 'position:fixed;z-index:2147483645;pointer-events:none;background:#92400e;color:#fff;font:12px/1.4 ui-monospace,monospace;padding:5px 7px;border-radius:6px;max-width:340px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+  label.textContent = `FlexWeb target: ${selector}`;
+  document.documentElement.append(overlay, label);
+  const update = (): void => {
+    const target = document.querySelector(selector);
+    if (!target) {
+      clearSelectedHighlight();
+      return;
+    }
+    const rect = target.getBoundingClientRect();
+    overlay.style.left = `${Math.max(0, rect.left)}px`;
+    overlay.style.top = `${Math.max(0, rect.top)}px`;
+    overlay.style.width = `${rect.width}px`;
+    overlay.style.height = `${rect.height}px`;
+    overlay.style.display = rect.width > 0 && rect.height > 0 ? 'block' : 'none';
+    label.style.left = `${Math.max(8, rect.left)}px`;
+    label.style.top = `${Math.max(8, rect.top - 30)}px`;
+  };
+  const intervalId = window.setInterval(update, 250);
+  selectedHighlight = { overlay, label, selector, intervalId };
+  update();
+}
+
+function clearSelectedHighlight(): void {
+  if (!selectedHighlight) return;
+  window.clearInterval(selectedHighlight.intervalId);
+  selectedHighlight.overlay.remove();
+  selectedHighlight.label.remove();
+  selectedHighlight = null;
 }
 
 function applyModifications(modifications: Modification[]): void {

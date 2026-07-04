@@ -75,6 +75,8 @@ export interface GeneratedModification {
 export type RuntimeMessage =
   | { type: 'GET_PAGE_CONTEXT' }
   | { type: 'START_ELEMENT_PICKER' }
+  | { type: 'HIGHLIGHT_SELECTED_ELEMENT'; selector: string }
+  | { type: 'CLEAR_ELEMENT_HIGHLIGHT' }
   | { type: 'APPLY_MODIFICATIONS'; modifications: Modification[] }
   | { type: 'GET_STATE' }
   | { type: 'SAVE_SETTINGS'; settings: ProviderSettings }

@@ -39,6 +39,12 @@ export async function startElementPicker(): Promise<SelectedElement> {
   return response.element;
 }
 
+export async function clearElementHighlight(): Promise<void> {
+  const tab = await getActiveTab();
+  if (!tab?.id || !tab.url || !isInjectablePage(tab.url)) return;
+  await sendToContentWithFallback<Ok<Record<string, never>>>(tab.id, { type: 'CLEAR_ELEMENT_HIGHLIGHT' }).catch(() => undefined);
+}
+
 async function sendToContentWithFallback<T>(tabId: number, message: RuntimeMessage): Promise<T> {
   try {
     return await send<T>(message, tabId);
