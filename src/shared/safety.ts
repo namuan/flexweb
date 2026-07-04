@@ -1,14 +1,49 @@
 import type { GeneratedModification, Modification, SafetyFinding } from './types';
 
 const RISKY_PATTERNS: Array<{ pattern: RegExp; category: string; message: string; severity: SafetyFinding['severity'] }> = [
-  { pattern: /\b(fetch|XMLHttpRequest|sendBeacon|WebSocket|EventSource)\b/, category: 'Network access', message: 'JavaScript appears to make network requests. Review for data exfiltration risk.', severity: 'blocker' },
-  { pattern: /\b(localStorage|sessionStorage|indexedDB|cookie)\b|document\.cookie/, category: 'Storage or cookies', message: 'JavaScript accesses browser/page storage or cookies.', severity: 'blocker' },
-  { pattern: /\b(password|credential|token|authorization|auth|secret|card|cc-number)\b/i, category: 'Sensitive data', message: 'JavaScript references words commonly associated with credentials or payment data.', severity: 'blocker' },
-  { pattern: /\b(location\.(href|assign|replace)|window\.open|history\.(pushState|replaceState))\b/, category: 'Navigation', message: 'JavaScript may navigate or alter page history.', severity: 'warning' },
+  {
+    pattern: /\b(fetch|XMLHttpRequest|sendBeacon|WebSocket|EventSource)\b/,
+    category: 'Network access',
+    message: 'JavaScript appears to make network requests. Review for data exfiltration risk.',
+    severity: 'blocker',
+  },
+  {
+    pattern: /\b(localStorage|sessionStorage|indexedDB|cookie)\b|document\.cookie/,
+    category: 'Storage or cookies',
+    message: 'JavaScript accesses browser/page storage or cookies.',
+    severity: 'blocker',
+  },
+  {
+    pattern: /\b(password|credential|token|authorization|auth|secret|card|cc-number)\b/i,
+    category: 'Sensitive data',
+    message: 'JavaScript references words commonly associated with credentials or payment data.',
+    severity: 'blocker',
+  },
+  {
+    pattern: /\b(location\.(href|assign|replace)|window\.open|history\.(pushState|replaceState))\b/,
+    category: 'Navigation',
+    message: 'JavaScript may navigate or alter page history.',
+    severity: 'warning',
+  },
   { pattern: /(submit\(|requestSubmit\(|form\.submit)/, category: 'Form submission', message: 'JavaScript may submit forms.', severity: 'blocker' },
-  { pattern: /\b(innerHTML|outerHTML|insertAdjacentHTML|document\.write)\b/, category: 'HTML injection', message: 'JavaScript writes raw HTML, which can break page behavior or introduce injection risk.', severity: 'warning' },
-  { pattern: /\b(eval\(|Function\(|setTimeout\s*\(\s*['"`]|setInterval\s*\(\s*['"`])/, category: 'Dynamic code', message: 'JavaScript constructs code dynamically.', severity: 'blocker' },
-  { pattern: /(remove\(|replaceWith\(|replaceChildren\(|appendChild\(|prepend\()/, category: 'DOM mutation', message: 'JavaScript mutates the DOM. Confirm it preserves page functionality.', severity: 'info' }
+  {
+    pattern: /\b(innerHTML|outerHTML|insertAdjacentHTML|document\.write)\b/,
+    category: 'HTML injection',
+    message: 'JavaScript writes raw HTML, which can break page behavior or introduce injection risk.',
+    severity: 'warning',
+  },
+  {
+    pattern: /\b(eval\(|Function\(|setTimeout\s*\(\s*['"`]|setInterval\s*\(\s*['"`])/,
+    category: 'Dynamic code',
+    message: 'JavaScript constructs code dynamically.',
+    severity: 'blocker',
+  },
+  {
+    pattern: /(remove\(|replaceWith\(|replaceChildren\(|appendChild\(|prepend\()/,
+    category: 'DOM mutation',
+    message: 'JavaScript mutates the DOM. Confirm it preserves page functionality.',
+    severity: 'info',
+  },
 ];
 
 export function analyzeSafety(input: Pick<GeneratedModification | Modification, 'css' | 'javascript' | 'type'>): SafetyFinding[] {

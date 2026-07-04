@@ -4,14 +4,14 @@ const DEFAULT_SETTINGS: ProviderSettings = {
   baseUrl: 'https://openrouter.ai/api/v1',
   apiKey: '',
   model: 'openai/gpt-4o-mini',
-  privacyMode: 'page-context'
+  privacyMode: 'page-context',
 };
 
 export async function getState(): Promise<AppState> {
   const stored = await chrome.storage.local.get(['modifications', 'settings']);
   return {
     modifications: Array.isArray(stored.modifications) ? stored.modifications : [],
-    settings: { ...DEFAULT_SETTINGS, ...(stored.settings ?? {}) }
+    settings: { ...DEFAULT_SETTINGS, ...(stored.settings ?? {}) },
   };
 }
 
@@ -51,7 +51,7 @@ export async function disableAllModifications(): Promise<Modification[]> {
 
 export async function reportModificationRun(id: string, status: 'applied' | 'error', message?: string): Promise<Modification[]> {
   const state = await getState();
-  const next = state.modifications.map((item) => item.id === id ? { ...item, lastRun: { at: new Date().toISOString(), status, message } } : item);
+  const next = state.modifications.map((item) => (item.id === id ? { ...item, lastRun: { at: new Date().toISOString(), status, message } } : item));
   await chrome.storage.local.set({ modifications: next });
   return next;
 }

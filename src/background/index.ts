@@ -1,8 +1,17 @@
 import { generateModification } from '../shared/ai';
 import { LIBRARY, libraryItemToModification } from '../shared/library';
 import { anyPatternMatches } from '../shared/match';
-import { deleteModification, disableAllModifications, getState, makeId, reportModificationRun, saveModification, saveSettings, toggleModification } from '../shared/storage';
 import { analyzeSafety, hasBlockers } from '../shared/safety';
+import {
+  deleteModification,
+  disableAllModifications,
+  getState,
+  makeId,
+  reportModificationRun,
+  saveModification,
+  saveSettings,
+  toggleModification,
+} from '../shared/storage';
 import type { GeneratedModification, Modification, RuntimeMessage } from '../shared/types';
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -14,9 +23,11 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 });
 
 chrome.runtime.onMessage.addListener((message: RuntimeMessage, sender, sendResponse) => {
-  void handleMessage(message, sender).then(sendResponse).catch((error: unknown) => {
-    sendResponse({ ok: false, error: error instanceof Error ? error.message : String(error) });
-  });
+  void handleMessage(message, sender)
+    .then(sendResponse)
+    .catch((error: unknown) => {
+      sendResponse({ ok: false, error: error instanceof Error ? error.message : String(error) });
+    });
   return true;
 });
 
@@ -92,7 +103,7 @@ export function generatedToModification(generated: GeneratedModification, source
     createdAt: now,
     updatedAt: now,
     permissionsRequired: [],
-    safetyStatus: 'generated'
+    safetyStatus: 'generated',
   };
 }
 
@@ -114,27 +125,37 @@ async function runJavascriptModifications(tabId: number, modifications: Modifica
     if (!mod.javascript) continue;
     const findings = analyzeSafety(mod);
     if (hasBlockers(findings)) {
-      await reportModificationRun(mod.id, 'error', `Blocked by safety scanner: ${findings.filter((finding) => finding.severity === 'blocker').map((finding) => finding.category).join(', ')}`);
+      await reportModificationRun(
+        mod.id,
+        'error',
+        `Blocked by safety scanner: ${findings
+          .filter((finding) => finding.severity === 'blocker')
+          .map((finding) => finding.category)
+          .join(', ')}`,
+      );
       continue;
     }
-    await chrome.scripting.executeScript({
-      target: { tabId },
-      world: 'MAIN',
-      injectImmediately: false,
-      func: (code: string, marker: string) => {
-        const root = document.documentElement;
-        if (root.getAttribute(marker)) return;
-        root.setAttribute(marker, 'true');
-        // Execute in the page's main world so code that works in DevTools Console
-        // sees the same window/document/page globals when run by FlexWeb.
-        new Function(code)();
-      },
-      args: [mod.javascript, `flexweb-script-${mod.id}-${mod.updatedAt}`]
-    }).then(() => reportModificationRun(mod.id, 'applied')).catch((error: unknown) => {
-      const message = error instanceof Error ? error.message : String(error);
-      console.warn('FlexWeb JavaScript modification failed', mod.name, error);
-      return reportModificationRun(mod.id, 'error', message);
-    });
+    await chrome.scripting
+      .executeScript({
+        target: { tabId },
+        world: 'MAIN',
+        injectImmediately: false,
+        func: (code: string, marker: string) => {
+          const root = document.documentElement;
+          if (root.getAttribute(marker)) return;
+          root.setAttribute(marker, 'true');
+          // Execute in the page's main world so code that works in DevTools Console
+          // sees the same window/document/page globals when run by FlexWeb.
+          new Function(code)();
+        },
+        args: [mod.javascript, `flexweb-script-${mod.id}-${mod.updatedAt}`],
+      })
+      .then(() => reportModificationRun(mod.id, 'applied'))
+      .catch((error: unknown) => {
+        const message = error instanceof Error ? error.message : String(error);
+        console.warn('FlexWeb JavaScript modification failed', mod.name, error);
+        return reportModificationRun(mod.id, 'error', message);
+      });
   }
 }
 

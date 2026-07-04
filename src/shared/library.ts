@@ -1,5 +1,5 @@
-import type { LibraryItem, Modification } from './types';
 import { makeId } from './storage';
+import type { LibraryItem, Modification } from './types';
 
 export const LIBRARY: LibraryItem[] = [
   {
@@ -13,10 +13,11 @@ export const LIBRARY: LibraryItem[] = [
       description: 'Pointer-following reading guide.',
       type: 'hybrid',
       css: '#flexweb-focus-bar{position:fixed;left:0;right:0;height:44px;pointer-events:none;background:color-mix(in oklch, gold 20%, transparent);z-index:2147483646;mix-blend-mode:multiply;transition:transform .08s linear}',
-      javascript: "if(!document.getElementById('flexweb-focus-bar')){const bar=document.createElement('div');bar.id='flexweb-focus-bar';document.documentElement.appendChild(bar);document.addEventListener('mousemove',e=>{bar.style.transform=`translateY(${e.clientY-22}px)`},{passive:true});}"
+      javascript:
+        "if(!document.getElementById('flexweb-focus-bar')){const bar=document.createElement('div');bar.id='flexweb-focus-bar';document.documentElement.appendChild(bar);document.addEventListener('mousemove',e=>{bar.style.transform=`translateY(${e.clientY-22}px)`},{passive:true});}",
     },
     author: 'FlexWeb',
-    trustLevel: 'built-in'
+    trustLevel: 'built-in',
   },
   {
     id: 'calm-page',
@@ -28,10 +29,10 @@ export const LIBRARY: LibraryItem[] = [
       name: 'Calm Page Tone',
       description: 'Warmer background and more comfortable line height.',
       type: 'css',
-      css: 'html{background:#f7f1e8!important}body{background:#f7f1e8!important;color:#2d2821!important;line-height:1.65!important}p,li{max-width:78ch}'
+      css: 'html{background:#f7f1e8!important}body{background:#f7f1e8!important;color:#2d2821!important;line-height:1.65!important}p,li{max-width:78ch}',
     },
     author: 'FlexWeb',
-    trustLevel: 'built-in'
+    trustLevel: 'built-in',
   },
   {
     id: 'hide-sticky',
@@ -43,11 +44,11 @@ export const LIBRARY: LibraryItem[] = [
       name: 'Hide Sticky Clutter',
       description: 'Removes common fixed-position clutter.',
       type: 'css',
-      css: '[class*=cookie i],[id*=cookie i],[class*=newsletter i],[class*=subscribe i],[class*=modal i]{display:none!important}body>*{scroll-margin-top:0!important}'
+      css: '[class*=cookie i],[id*=cookie i],[class*=newsletter i],[class*=subscribe i],[class*=modal i]{display:none!important}body>*{scroll-margin-top:0!important}',
     },
     author: 'FlexWeb',
-    trustLevel: 'built-in'
-  }
+    trustLevel: 'built-in',
+  },
 ];
 
 export function libraryItemToModification(item: LibraryItem, matchPattern: string): Modification {
@@ -65,6 +66,6 @@ export function libraryItemToModification(item: LibraryItem, matchPattern: strin
     createdAt: now,
     updatedAt: now,
     permissionsRequired: [],
-    safetyStatus: 'template'
+    safetyStatus: 'template',
   };
 }

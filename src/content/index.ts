@@ -8,9 +8,11 @@ chrome.runtime.onMessage.addListener((message: RuntimeMessage, _sender, sendResp
   try {
     if (message.type === 'GET_PAGE_CONTEXT') sendResponse({ ok: true, context: collectPageContext() });
     if (message.type === 'START_ELEMENT_PICKER') {
-      startElementPicker().then((element) => sendResponse({ ok: true, element })).catch((error: unknown) => {
-        sendResponse({ ok: false, error: error instanceof Error ? error.message : String(error) });
-      });
+      startElementPicker()
+        .then((element) => sendResponse({ ok: true, element }))
+        .catch((error: unknown) => {
+          sendResponse({ ok: false, error: error instanceof Error ? error.message : String(error) });
+        });
     }
     if (message.type === 'HIGHLIGHT_SELECTED_ELEMENT') {
       highlightSelectedElement(message.selector);
@@ -30,11 +32,14 @@ chrome.runtime.onMessage.addListener((message: RuntimeMessage, _sender, sendResp
   return true;
 });
 
-chrome.runtime.sendMessage({ type: 'GET_STATE' }).then((response) => {
-  const url = location.href;
-  const mods = (response?.state?.modifications ?? []) as Modification[];
-  applyModifications(mods.filter((mod) => mod.enabled && mod.matchPatterns.some((pattern) => matchesHere(url, pattern))));
-}).catch(() => undefined);
+chrome.runtime
+  .sendMessage({ type: 'GET_STATE' })
+  .then((response) => {
+    const url = location.href;
+    const mods = (response?.state?.modifications ?? []) as Modification[];
+    applyModifications(mods.filter((mod) => mod.enabled && mod.matchPatterns.some((pattern) => matchesHere(url, pattern))));
+  })
+  .catch(() => undefined);
 
 chrome.runtime.sendMessage({ type: 'PAGE_READY', url: location.href }).catch(() => undefined);
 
@@ -51,7 +56,7 @@ function collectPageContext(): PageContext {
     selectedText: clean(String(window.getSelection?.() ?? '')).slice(0, 3000),
     headings,
     visibleTextSample: clean(document.body?.innerText ?? '').slice(0, 6000),
-    elementSummary: summarizeElements()
+    elementSummary: summarizeElements(),
   };
 }
 
@@ -63,7 +68,7 @@ function summarizeElements(): PageContext['elementSummary'] {
     .map((element) => ({
       selector: selectorFor(element),
       role: element.getAttribute('role') || element.tagName.toLowerCase(),
-      text: clean(element.textContent ?? '').slice(0, 120)
+      text: clean(element.textContent ?? '').slice(0, 120),
     }))
     .filter((item) => item.text || item.role !== 'div')
     .slice(0, 30);
@@ -76,7 +81,11 @@ function isVisible(element: Element): boolean {
 }
 
 function isSensitive(element: Element): boolean {
-  return Boolean(element.closest('input[type="password"], input[type="email"], input[type="tel"], input[name*="token" i], input[name*="card" i], textarea, [autocomplete="cc-number"]'));
+  return Boolean(
+    element.closest(
+      'input[type="password"], input[type="email"], input[type="tel"], input[name*="token" i], input[name*="card" i], textarea, [autocomplete="cc-number"]',
+    ),
+  );
 }
 
 function selectorFor(element: Element): string {
@@ -127,7 +136,7 @@ function describeElement(element: Element): SelectedElement {
     role: element.getAttribute('role') || element.tagName.toLowerCase(),
     text: clean(element.textContent ?? '').slice(0, 500),
     attributes,
-    path
+    path,
   };
 }
 
@@ -139,8 +148,10 @@ function startElementPicker(): Promise<SelectedElement> {
     const blocker = document.createElement('div');
     let current: Element | null = null;
 
-    overlay.style.cssText = 'position:fixed;z-index:2147483647;pointer-events:none;border:2px solid #2563eb;background:rgba(37,99,235,.16);box-shadow:0 0 0 99999px rgba(15,23,42,.18);display:none;border-radius:3px;';
-    label.style.cssText = 'position:fixed;z-index:2147483647;pointer-events:none;background:#111827;color:#fff;font:12px/1.4 ui-monospace,monospace;padding:5px 7px;border-radius:6px;display:none;max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+    overlay.style.cssText =
+      'position:fixed;z-index:2147483647;pointer-events:none;border:2px solid #2563eb;background:rgba(37,99,235,.16);box-shadow:0 0 0 99999px rgba(15,23,42,.18);display:none;border-radius:3px;';
+    label.style.cssText =
+      'position:fixed;z-index:2147483647;pointer-events:none;background:#111827;color:#fff;font:12px/1.4 ui-monospace,monospace;padding:5px 7px;border-radius:6px;display:none;max-width:320px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
     blocker.style.cssText = 'position:fixed;inset:0;z-index:2147483646;cursor:crosshair;background:transparent;';
     blocker.setAttribute('aria-label', 'FlexWeb element picker active');
     document.documentElement.append(overlay, label, blocker);
@@ -211,8 +222,10 @@ function highlightSelectedElement(selector: string): void {
   if (!element) return;
   const overlay = document.createElement('div');
   const label = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;z-index:2147483645;pointer-events:none;border:2px solid #f59e0b;background:rgba(245,158,11,.18);box-shadow:0 0 0 1px rgba(17,24,39,.35),0 8px 30px rgba(245,158,11,.35);border-radius:3px;';
-  label.style.cssText = 'position:fixed;z-index:2147483645;pointer-events:none;background:#92400e;color:#fff;font:12px/1.4 ui-monospace,monospace;padding:5px 7px;border-radius:6px;max-width:340px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
+  overlay.style.cssText =
+    'position:fixed;z-index:2147483645;pointer-events:none;border:2px solid #f59e0b;background:rgba(245,158,11,.18);box-shadow:0 0 0 1px rgba(17,24,39,.35),0 8px 30px rgba(245,158,11,.35);border-radius:3px;';
+  label.style.cssText =
+    'position:fixed;z-index:2147483645;pointer-events:none;background:#92400e;color:#fff;font:12px/1.4 ui-monospace,monospace;padding:5px 7px;border-radius:6px;max-width:340px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;';
   label.textContent = `FlexWeb target: ${selector}`;
   document.documentElement.append(overlay, label);
   const update = (): void => {
@@ -255,7 +268,9 @@ function applyModifications(modifications: Modification[]): void {
         upsertStyle(mod.id, mod.css);
         chrome.runtime.sendMessage({ type: 'REPORT_MODIFICATION_RUN', id: mod.id, status: 'applied' }).catch(() => undefined);
       } catch (error) {
-        chrome.runtime.sendMessage({ type: 'REPORT_MODIFICATION_RUN', id: mod.id, status: 'error', message: error instanceof Error ? error.message : String(error) }).catch(() => undefined);
+        chrome.runtime
+          .sendMessage({ type: 'REPORT_MODIFICATION_RUN', id: mod.id, status: 'error', message: error instanceof Error ? error.message : String(error) })
+          .catch(() => undefined);
       }
     }
   }
@@ -278,10 +293,13 @@ function installSpaObserver(): void {
     if (location.href === previous) return;
     previous = location.href;
     chrome.runtime.sendMessage({ type: 'ROUTE_CHANGED', url: location.href }).catch(() => undefined);
-    chrome.runtime.sendMessage({ type: 'GET_STATE' }).then((response) => {
-      const mods = (response?.state?.modifications ?? []) as Modification[];
-      applyModifications(mods.filter((mod) => mod.enabled && mod.matchPatterns.some((pattern) => matchesHere(location.href, pattern))));
-    }).catch(() => undefined);
+    chrome.runtime
+      .sendMessage({ type: 'GET_STATE' })
+      .then((response) => {
+        const mods = (response?.state?.modifications ?? []) as Modification[];
+        applyModifications(mods.filter((mod) => mod.enabled && mod.matchPatterns.some((pattern) => matchesHere(location.href, pattern))));
+      })
+      .catch(() => undefined);
   }, 800);
 }
 

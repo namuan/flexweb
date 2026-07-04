@@ -1,6 +1,6 @@
-import type { GenerateRequest, GeneratedModification, ProviderSettings } from './types';
 import { patternForUrl } from './match';
 import { analyzeSafety, riskFromFindings } from './safety';
+import type { GeneratedModification, GenerateRequest, ProviderSettings } from './types';
 
 export async function generateModification(settings: ProviderSettings, request: GenerateRequest): Promise<GeneratedModification> {
   if (!settings.apiKey.trim()) {
@@ -28,7 +28,7 @@ Rules:
     suggestedPattern: patternForUrl(request.pageContext.url),
     instruction: request.pageContext.targetElement
       ? 'Implement the refined prompt only for pageContext.targetElement. Include implementationPlan explaining how the selected element is targeted. Include rollbackNotes explaining how to reverse/disable the change.'
-      : 'Implement the refined prompt. Include implementationPlan explaining concrete actions. Include rollbackNotes explaining how to reverse/disable the change.'
+      : 'Implement the refined prompt. Include implementationPlan explaining concrete actions. Include rollbackNotes explaining how to reverse/disable the change.',
   });
 
   const controller = new AbortController();
@@ -42,24 +42,25 @@ Rules:
       'Content-Type': 'application/json',
       Authorization: `Bearer ${settings.apiKey}`,
       'HTTP-Referer': 'https://flexweb.local',
-      'X-Title': 'FlexWeb'
+      'X-Title': 'FlexWeb',
     },
     body: JSON.stringify({
       model: settings.model,
       messages: [
         { role: 'system', content: system },
-        { role: 'user', content: user }
+        { role: 'user', content: user },
       ],
       response_format: { type: 'json_object' },
-      temperature: 0.2
-    })
+      temperature: 0.2,
+    }),
   }).finally(() => clearTimeout(timeoutId));
 
   if (!response.ok) {
     const body = await response.text();
-    const hint = response.status === 404
-      ? ' Check the provider base URL. For OpenRouter use https://openrouter.ai/api/v1, not a model URL or a duplicated /chat/completions path.'
-      : '';
+    const hint =
+      response.status === 404
+        ? ' Check the provider base URL. For OpenRouter use https://openrouter.ai/api/v1, not a model URL or a duplicated /chat/completions path.'
+        : '';
     throw new Error(`AI provider returned ${response.status} from ${endpoint}: ${body}${hint}`);
   }
   const data = JSON.parse(await response.text()) as { choices?: Array<{ message?: { content?: string | object } }> };
@@ -68,14 +69,14 @@ Rules:
   return validateGenerated(typeof content === 'string' ? parseJsonObject(content) : content, request.pageContext.url);
 }
 
-function chatCompletionsEndpoint(baseUrl: string): string {
+export function chatCompletionsEndpoint(baseUrl: string): string {
   const trimmed = baseUrl.trim().replace(/\/+$/, '');
   if (!trimmed) return 'https://openrouter.ai/api/v1/chat/completions';
   if (/\/chat\/completions$/i.test(trimmed)) return trimmed;
   return `${trimmed}/chat/completions`;
 }
 
-function parseJsonObject(content: string): unknown {
+export function parseJsonObject(content: string): unknown {
   const trimmed = content.trim();
   try {
     return JSON.parse(trimmed);
@@ -99,7 +100,7 @@ function validateGenerated(value: unknown, url: string): GeneratedModification {
   const generatedCandidate = {
     type: candidate.type,
     css: candidate.css,
-    javascript: candidate.javascript
+    javascript: candidate.javascript,
   };
   const findings = analyzeSafety(generatedCandidate);
   return {
@@ -114,7 +115,7 @@ function validateGenerated(value: unknown, url: string): GeneratedModification {
     refinedPrompt: candidate.refinedPrompt,
     rollbackNotes: candidate.rollbackNotes ?? 'Disable or delete this modification in FlexWeb to remove the injected CSS/JavaScript.',
     safetyFindings: findings,
-    riskLevel: riskFromFindings(findings) === 'low' ? (candidate.riskLevel ?? 'low') : riskFromFindings(findings)
+    riskLevel: riskFromFindings(findings) === 'low' ? (candidate.riskLevel ?? 'low') : riskFromFindings(findings),
   };
 }
 
@@ -123,10 +124,21 @@ function refinePrompt(prompt: string): string {
   const refinements: string[] = [];
 
   if (/easier to read|readable|reading|focus/.test(normalized)) {
-    refinements.push('increase readable font sizes where appropriate', 'increase line-height for text blocks', 'limit long paragraphs to a comfortable max-width', 'improve foreground/background contrast', 'add comfortable spacing around article content');
+    refinements.push(
+      'increase readable font sizes where appropriate',
+      'increase line-height for text blocks',
+      'limit long paragraphs to a comfortable max-width',
+      'improve foreground/background contrast',
+      'add comfortable spacing around article content',
+    );
   }
   if (/modern|clean|better design|prettier|nice/.test(normalized)) {
-    refinements.push('simplify visual clutter', 'normalize spacing', 'soften harsh borders/backgrounds', 'improve typographic hierarchy without changing functionality');
+    refinements.push(
+      'simplify visual clutter',
+      'normalize spacing',
+      'soften harsh borders/backgrounds',
+      'improve typographic hierarchy without changing functionality',
+    );
   }
   if (/distract|clutter|annoying|hide/.test(normalized)) {
     refinements.push('hide clearly promotional, sticky, modal, cookie, newsletter, or sidebar clutter only when selectors indicate that purpose');

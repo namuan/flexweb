@@ -1,6 +1,15 @@
-import type { AppState, GeneratedModification, LibraryItem, Modification, PageContext, ProviderSettings, RuntimeMessage, SelectedElement } from '../shared/types';
-import { makeId } from '../shared/storage';
 import { anyPatternMatches } from '../shared/match';
+import { makeId } from '../shared/storage';
+import type {
+  AppState,
+  GeneratedModification,
+  LibraryItem,
+  Modification,
+  PageContext,
+  ProviderSettings,
+  RuntimeMessage,
+  SelectedElement,
+} from '../shared/types';
 
 type Ok<T> = { ok: true } & T;
 
@@ -38,7 +47,9 @@ export async function getPageContext(): Promise<PageContext> {
   const tab = await getActiveTab();
   if (!tab?.id) throw new Error('No active tab available.');
   if (!tab.url || !isInjectablePage(tab.url)) {
-    throw new Error('FlexWeb cannot read this page. Open an http, https, or file page and try again. Browser internal pages and the Chrome Web Store are restricted.');
+    throw new Error(
+      'FlexWeb cannot read this page. Open an http, https, or file page and try again. Browser internal pages and the Chrome Web Store are restricted.',
+    );
   }
   const response = await sendToContentWithFallback<Ok<{ context: PageContext }>>(tab.id, { type: 'GET_PAGE_CONTEXT' });
   return response.context;
@@ -112,7 +123,7 @@ export async function generate(prompt: string, pageContext: PageContext): Promis
   const response = await withTimeout(
     send<Ok<{ generated: GeneratedModification }>>({ type: 'GENERATE_MODIFICATION', request: { prompt, pageContext } }),
     75000,
-    'Generation timed out. The model may still have responded, but the extension did not receive a complete result. Try again or choose a faster model.'
+    'Generation timed out. The model may still have responded, but the extension did not receive a complete result. Try again or choose a faster model.',
   );
   return response.generated;
 }
@@ -142,6 +153,6 @@ export function generatedToModification(generated: GeneratedModification, prompt
     permissionsRequired: [],
     safetyStatus: 'user-reviewed',
     safetyFindings: generated.safetyFindings,
-    rollbackNotes: generated.rollbackNotes
+    rollbackNotes: generated.rollbackNotes,
   };
 }

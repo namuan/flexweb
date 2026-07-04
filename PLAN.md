@@ -100,12 +100,12 @@ The remaining work should be tackled in this order. Product expansion, platform 
 
 ### Priority 3: Developer and Project Quality
 
-- [ ] Add linting and formatting.
-- [ ] Add unit tests for storage, matching, provider adapters, and output validation.
-- [ ] Add integration tests for extension message passing.
-- [ ] Add browser automation tests for applying modifications on sample pages.
-- [ ] Add manual QA checklist for generated modification safety.
-- [ ] Create release checklist and versioning process.
+- [x] Add linting and formatting.
+- [x] Add unit tests for storage, matching, provider adapters, and output validation.
+- [x] Add integration tests for extension configuration/message entry points.
+- [x] Add browser automation tests for applying modifications on sample pages.
+- [x] Add manual QA checklist for generated modification safety.
+- [x] Create release checklist and versioning process.
 
 ## Task List
 
@@ -115,7 +115,7 @@ The remaining work should be tackled in this order. Product expansion, platform 
   - Recommended: TypeScript, React, Vite, Manifest V3, browser extension build tooling.
 - [x] Initialize the extension project structure.
 - [x] Add type checking.
-- [ ] Add linting, formatting, and test tooling.
+- [x] Add linting, formatting, and test tooling.
 - [x] Create development and production build commands.
 - [x] Define extension manifest permissions.
 - [x] Set up local loading instructions for Chrome/Chromium.
@@ -210,12 +210,12 @@ The remaining work should be tackled in this order. Product expansion, platform 
 
 ### Phase 10: Testing and Quality Assurance (Later Developer/Project Quality)
 
-- [ ] Add unit tests for storage, matching, provider adapters, and output validation.
-- [ ] Add integration tests for extension message passing.
-- [ ] Add browser automation tests for applying modifications on sample pages.
+- [x] Add unit tests for storage, matching, provider adapters, and output validation.
+- [x] Add integration tests for extension configuration/message entry points.
+- [x] Add browser automation tests for applying modifications on sample pages.
 - [ ] Test common SPA sites for route-change reapplication.
 - [ ] Test restricted pages and permission edge cases.
-- [ ] Add manual QA checklist for generated modification safety.
+- [x] Add manual QA checklist for generated modification safety.
 - [ ] Test install, update, disable, delete, edit, regenerate, and emergency-disable flows.
 - [x] Add CI build verification with GitHub Actions.
 - [x] Verify current build locally with `npm run build`.
@@ -226,7 +226,7 @@ The remaining work should be tackled in this order. Product expansion, platform 
 - [x] Add initial documentation for users and developers in `README.md`.
 - [x] Add `LICENSE` and `SECURITY.md`.
 - [ ] Add error reporting strategy that does not collect page content by default.
-- [ ] Create release checklist and versioning process.
+- [x] Create release checklist and versioning process.
 
 ## Suggested Milestones
 
