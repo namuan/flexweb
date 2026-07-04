@@ -83,6 +83,11 @@ export async function deleteModification(id: string): Promise<Modification[]> {
   return response.modifications;
 }
 
+export async function disableAllModifications(): Promise<Modification[]> {
+  const response = await send<Ok<{ modifications: Modification[] }>>({ type: 'DISABLE_ALL_MODIFICATIONS' });
+  return response.modifications;
+}
+
 export async function installLibraryItem(itemId: string, matchPattern: string): Promise<Modification[]> {
   const response = await send<Ok<{ modifications: Modification[] }>>({ type: 'INSTALL_LIBRARY_ITEM', itemId, matchPattern });
   return response.modifications;
@@ -120,6 +125,8 @@ export function generatedToModification(generated: GeneratedModification, prompt
     createdAt: now,
     updatedAt: now,
     permissionsRequired: [],
-    safetyStatus: 'user-reviewed'
+    safetyStatus: 'user-reviewed',
+    safetyFindings: generated.safetyFindings,
+    rollbackNotes: generated.rollbackNotes
   };
 }

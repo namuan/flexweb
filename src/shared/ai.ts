@@ -1,5 +1,6 @@
 import type { GenerateRequest, GeneratedModification, ProviderSettings } from './types';
 import { patternForUrl } from './match';
+import { analyzeSafety, riskFromFindings } from './safety';
 
 export async function generateModification(settings: ProviderSettings, request: GenerateRequest): Promise<GeneratedModification> {
   if (!settings.apiKey.trim()) {
@@ -9,7 +10,7 @@ export async function generateModification(settings: ProviderSettings, request: 
   const refinedPrompt = refinePrompt(request.prompt);
   const system = `You generate browser extension website customizations based on HCI findings about LLM webpage editing.
 
-Return only valid JSON matching this schema: {"name": string, "description": string, "matchPatterns": string[], "type": "css"|"javascript"|"hybrid", "css"?: string, "javascript"?: string, "explanation": string, "implementationPlan"?: string[], "refinedPrompt"?: string, "riskLevel": "low"|"medium"|"high"}.
+Return only valid JSON matching this schema: {"name": string, "description": string, "matchPatterns": string[], "type": "css"|"javascript"|"hybrid", "css"?: string, "javascript"?: string, "explanation": string, "implementationPlan"?: string[], "refinedPrompt"?: string, "rollbackNotes"?: string, "riskLevel": "low"|"medium"|"high"}.
 
 Rules:
 1. Prefer CSS-only modifications. Use JavaScript only when CSS cannot accomplish the request.
@@ -26,8 +27,8 @@ Rules:
     pageContext: request.pageContext,
     suggestedPattern: patternForUrl(request.pageContext.url),
     instruction: request.pageContext.targetElement
-      ? 'Implement the refined prompt only for pageContext.targetElement. Include implementationPlan explaining how the selected element is targeted.'
-      : 'Implement the refined prompt. Include implementationPlan explaining concrete actions.'
+      ? 'Implement the refined prompt only for pageContext.targetElement. Include implementationPlan explaining how the selected element is targeted. Include rollbackNotes explaining how to reverse/disable the change.'
+      : 'Implement the refined prompt. Include implementationPlan explaining concrete actions. Include rollbackNotes explaining how to reverse/disable the change.'
   });
 
   const controller = new AbortController();
@@ -95,6 +96,12 @@ function validateGenerated(value: unknown, url: string): GeneratedModification {
   }
   if (!['css', 'javascript', 'hybrid'].includes(candidate.type)) throw new Error('Unsupported modification type.');
   if (!candidate.css && !candidate.javascript) throw new Error('Generated modification contains no CSS or JavaScript.');
+  const generatedCandidate = {
+    type: candidate.type,
+    css: candidate.css,
+    javascript: candidate.javascript
+  };
+  const findings = analyzeSafety(generatedCandidate);
   return {
     name: candidate.name,
     description: candidate.description,
@@ -105,7 +112,9 @@ function validateGenerated(value: unknown, url: string): GeneratedModification {
     explanation: candidate.explanation,
     implementationPlan: candidate.implementationPlan,
     refinedPrompt: candidate.refinedPrompt,
-    riskLevel: candidate.riskLevel ?? 'medium'
+    rollbackNotes: candidate.rollbackNotes ?? 'Disable or delete this modification in FlexWeb to remove the injected CSS/JavaScript.',
+    safetyFindings: findings,
+    riskLevel: riskFromFindings(findings) === 'low' ? (candidate.riskLevel ?? 'low') : riskFromFindings(findings)
   };
 }
 

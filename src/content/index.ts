@@ -250,7 +250,14 @@ function applyModifications(modifications: Modification[]): void {
   }
   activeIds = nextIds;
   for (const mod of modifications) {
-    if (mod.css) upsertStyle(mod.id, mod.css);
+    if (mod.css) {
+      try {
+        upsertStyle(mod.id, mod.css);
+        chrome.runtime.sendMessage({ type: 'REPORT_MODIFICATION_RUN', id: mod.id, status: 'applied' }).catch(() => undefined);
+      } catch (error) {
+        chrome.runtime.sendMessage({ type: 'REPORT_MODIFICATION_RUN', id: mod.id, status: 'error', message: error instanceof Error ? error.message : String(error) }).catch(() => undefined);
+      }
+    }
   }
 }
 

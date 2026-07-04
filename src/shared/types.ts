@@ -1,5 +1,11 @@
 export type ModificationType = 'css' | 'javascript' | 'hybrid';
 
+export interface SafetyFinding {
+  severity: 'info' | 'warning' | 'blocker';
+  category: string;
+  message: string;
+}
+
 export interface Modification {
   id: string;
   name: string;
@@ -14,6 +20,8 @@ export interface Modification {
   updatedAt: string;
   permissionsRequired: string[];
   safetyStatus: 'generated' | 'template' | 'user-reviewed';
+  safetyFindings?: SafetyFinding[];
+  rollbackNotes?: string;
   lastRun?: { at: string; status: 'applied' | 'error'; message?: string };
 }
 
@@ -69,6 +77,8 @@ export interface GeneratedModification {
   explanation: string;
   implementationPlan?: string[];
   refinedPrompt?: string;
+  rollbackNotes?: string;
+  safetyFindings?: SafetyFinding[];
   riskLevel: 'low' | 'medium' | 'high';
 }
 
@@ -84,6 +94,8 @@ export type RuntimeMessage =
   | { type: 'SAVE_MODIFICATION'; modification: Modification }
   | { type: 'DELETE_MODIFICATION'; id: string }
   | { type: 'TOGGLE_MODIFICATION'; id: string; enabled: boolean }
+  | { type: 'DISABLE_ALL_MODIFICATIONS' }
+  | { type: 'REPORT_MODIFICATION_RUN'; id: string; status: 'applied' | 'error'; message?: string }
   | { type: 'INSTALL_LIBRARY_ITEM'; itemId: string; matchPattern: string }
   | { type: 'PAGE_READY'; url: string }
   | { type: 'ROUTE_CHANGED'; url: string };

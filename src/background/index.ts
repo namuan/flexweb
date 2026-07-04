@@ -1,7 +1,8 @@
 import { generateModification } from '../shared/ai';
 import { LIBRARY, libraryItemToModification } from '../shared/library';
 import { anyPatternMatches } from '../shared/match';
-import { deleteModification, getState, makeId, saveModification, saveSettings, toggleModification } from '../shared/storage';
+import { deleteModification, disableAllModifications, getState, makeId, reportModificationRun, saveModification, saveSettings, toggleModification } from '../shared/storage';
+import { analyzeSafety, hasBlockers } from '../shared/safety';
 import type { GeneratedModification, Modification, RuntimeMessage } from '../shared/types';
 
 chrome.runtime.onInstalled.addListener(() => {
@@ -10,10 +11,6 @@ chrome.runtime.onInstalled.addListener(() => {
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.url) void applyForTab(tabId, tab.url);
-});
-
-chrome.storage.onChanged.addListener(() => {
-  void refreshActiveTab();
 });
 
 chrome.runtime.onMessage.addListener((message: RuntimeMessage, sender, sendResponse) => {
@@ -36,13 +33,23 @@ async function handleMessage(message: RuntimeMessage, sender: chrome.runtime.Mes
       return { ok: true, generated };
     }
     case 'SAVE_MODIFICATION': {
-      const modifications = await saveModification(message.modification);
+      const safetyFindings = analyzeSafety(message.modification);
+      const modifications = await saveModification({ ...message.modification, safetyFindings });
       await refreshActiveTab();
       return { ok: true, modifications };
     }
     case 'DELETE_MODIFICATION': {
       const modifications = await deleteModification(message.id);
       await refreshActiveTab();
+      return { ok: true, modifications };
+    }
+    case 'DISABLE_ALL_MODIFICATIONS': {
+      const modifications = await disableAllModifications();
+      await refreshActiveTab();
+      return { ok: true, modifications };
+    }
+    case 'REPORT_MODIFICATION_RUN': {
+      const modifications = await reportModificationRun(message.id, message.status, message.message);
       return { ok: true, modifications };
     }
     case 'TOGGLE_MODIFICATION': {
@@ -62,6 +69,9 @@ async function handleMessage(message: RuntimeMessage, sender: chrome.runtime.Mes
       if (sender.tab?.id && isInjectable(message.url)) await applyForTab(sender.tab.id, message.url);
       return { ok: true };
     case 'GET_PAGE_CONTEXT':
+    case 'START_ELEMENT_PICKER':
+    case 'HIGHLIGHT_SELECTED_ELEMENT':
+    case 'CLEAR_ELEMENT_HIGHLIGHT':
     case 'APPLY_MODIFICATIONS':
       return { ok: false, error: 'This message is handled by the content script.' };
   }
@@ -102,6 +112,11 @@ async function applyForTab(tabId: number, url: string): Promise<void> {
 async function runJavascriptModifications(tabId: number, modifications: Modification[]): Promise<void> {
   for (const mod of modifications) {
     if (!mod.javascript) continue;
+    const findings = analyzeSafety(mod);
+    if (hasBlockers(findings)) {
+      await reportModificationRun(mod.id, 'error', `Blocked by safety scanner: ${findings.filter((finding) => finding.severity === 'blocker').map((finding) => finding.category).join(', ')}`);
+      continue;
+    }
     await chrome.scripting.executeScript({
       target: { tabId },
       world: 'MAIN',
@@ -115,7 +130,11 @@ async function runJavascriptModifications(tabId: number, modifications: Modifica
         new Function(code)();
       },
       args: [mod.javascript, `flexweb-script-${mod.id}-${mod.updatedAt}`]
-    }).catch((error: unknown) => console.warn('FlexWeb JavaScript modification failed', mod.name, error));
+    }).then(() => reportModificationRun(mod.id, 'applied')).catch((error: unknown) => {
+      const message = error instanceof Error ? error.message : String(error);
+      console.warn('FlexWeb JavaScript modification failed', mod.name, error);
+      return reportModificationRun(mod.id, 'error', message);
+    });
   }
 }
 

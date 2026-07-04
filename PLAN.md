@@ -84,12 +84,12 @@ The remaining work should be tackled in this order. UX polish and developer/proj
 
 ### Priority 1: Safety and Runtime Reliability
 
-- [ ] Add static safety checks before JavaScript execution.
-- [ ] Highlight requested permissions and risky behaviors.
-- [ ] Block or warn on network exfiltration, credential access, destructive DOM actions, and broad page access.
-- [ ] Track modification execution results and errors in the UI/storage model.
-- [ ] Add emergency disable-all control.
-- [ ] Add rollback notes to structured AI output.
+- [x] Add static safety checks before JavaScript execution.
+- [x] Highlight requested permissions and risky behaviors.
+- [x] Block or warn on network exfiltration, credential access, destructive DOM actions, and broad page access.
+- [x] Track modification execution results and errors in the UI/storage model.
+- [x] Add emergency disable-all control.
+- [x] Add rollback notes to structured AI output.
 
 ### Priority 2: Privacy and Context Control
 
@@ -176,10 +176,10 @@ The remaining work should be tackled in this order. UX polish and developer/proj
 
 - [x] Define the AI instruction format for generating website modifications.
 - [x] Require structured AI output containing explanation, match rules, code, implementation plan, refined prompt, and risk level.
-- [ ] Add rollback notes to structured AI output.
+- [x] Add rollback notes to structured AI output.
 - [x] Support CSS-first modifications for safer changes.
 - [x] Add JavaScript/DOM automation support.
-- [ ] Add static safety checks before JavaScript execution.
+- [x] Add static safety checks before JavaScript execution.
 - [x] Implement OpenAI-compatible provider adapter for AI calls.
 - [x] Implement BYOK provider configuration for OpenRouter/OpenAI-compatible APIs.
 - [x] Add request/response validation before accepting AI output.
@@ -193,7 +193,7 @@ The remaining work should be tackled in this order. UX polish and developer/proj
 - [x] Apply CSS modifications through injected style elements.
 - [x] Apply JavaScript modifications in the page main world so behavior matches DevTools Console more closely.
 - [ ] Add constrained/sandboxed runtime wrapper for JavaScript modifications.
-- [ ] Track modification execution results and errors in the UI/storage model.
+- [x] Track modification execution results and errors in the UI/storage model.
 - [x] Add enable/disable controls per modification.
 - [ ] Add undo/rollback support for the current session.
 - [x] Re-apply enabled modifications automatically on page load and route changes in single-page apps.
@@ -202,13 +202,13 @@ The remaining work should be tackled in this order. UX polish and developer/proj
 ### Phase 6: Safety and Trust Controls
 
 - [x] Create a review/approval step before saving generated modifications.
-- [ ] Highlight requested permissions and risky behaviors.
-- [ ] Block or warn on network exfiltration, credential access, destructive DOM actions, and broad page access.
+- [x] Highlight requested permissions and risky behaviors.
+- [x] Block or warn on network exfiltration, credential access, destructive DOM actions, and broad page access.
 - [x] Prefer declarative CSS and narrowly scoped selectors where possible through prompting and target-element mode.
 - [x] Add a user-visible generated code preview before approval.
 - [ ] Add a true diff preview against previous versions.
 - [x] Store generated code locally by default.
-- [ ] Add emergency disable-all control.
+- [x] Add emergency disable-all control.
 - [ ] Add import/export format with warning labels for untrusted modifications.
 
 ### Phase 7: Modification Management UI (Lower-Priority UX Polish)

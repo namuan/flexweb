@@ -41,6 +41,21 @@ export async function toggleModification(id: string, enabled: boolean): Promise<
   return next;
 }
 
+export async function disableAllModifications(): Promise<Modification[]> {
+  const state = await getState();
+  const now = new Date().toISOString();
+  const next = state.modifications.map((item) => ({ ...item, enabled: false, updatedAt: now }));
+  await chrome.storage.local.set({ modifications: next });
+  return next;
+}
+
+export async function reportModificationRun(id: string, status: 'applied' | 'error', message?: string): Promise<Modification[]> {
+  const state = await getState();
+  const next = state.modifications.map((item) => item.id === id ? { ...item, lastRun: { at: new Date().toISOString(), status, message } } : item);
+  await chrome.storage.local.set({ modifications: next });
+  return next;
+}
+
 export function makeId(prefix = 'mod'): string {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
