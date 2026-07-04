@@ -3,7 +3,7 @@ import type { ReactElement } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles.css';
 import { Brand, ModificationList } from './components';
-import { clearElementHighlight, deleteModification, generate, generatedToModification, getPageContext, getState, saveModification, startElementPicker, toggleModification } from './client';
+import { clearElementHighlight, deleteModification, generate, generatedToModification, getActiveTab, getPageContext, getState, modificationsForUrl, saveModification, startElementPicker, toggleModification, websiteLabel } from './client';
 import type { GeneratedModification, Modification, PageContext, SelectedElement } from '../shared/types';
 
 type ContextMode = 'page' | 'selected-text' | 'minimal';
@@ -15,6 +15,7 @@ function SidePanel(): ReactElement {
   const [consent, setConsent] = useState(false);
   const [generated, setGenerated] = useState<GeneratedModification | null>(null);
   const [mods, setMods] = useState<Modification[]>([]);
+  const [activeUrl, setActiveUrl] = useState<string>();
   const [targetElement, setTargetElement] = useState<SelectedElement | null>(null);
   const [picking, setPicking] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -23,9 +24,11 @@ function SidePanel(): ReactElement {
   useEffect(() => {
     getState().then(({ state }) => setMods(state.modifications));
     getPageContext().then(setContext).catch(() => undefined);
+    getActiveTab().then((tab) => setActiveUrl(tab?.url));
   }, []);
 
   const contextPreview = useMemo(() => describeContext(context, contextMode, targetElement), [context, contextMode, targetElement]);
+  const siteMods = useMemo(() => modificationsForUrl(mods, activeUrl), [mods, activeUrl]);
 
   async function runGenerate(): Promise<void> {
     if (!consent) {
@@ -83,7 +86,7 @@ function SidePanel(): ReactElement {
       {error && <p className="danger">{error}</p>}
     </section>
     {generated && <section className="panel stack"><div className="row"><div><h2>{generated.name}</h2><p className="muted">{generated.description}</p></div><span className="pill">{generated.riskLevel}</span></div>{generated.safetyFindings?.length ? <div className="stack"><strong>Safety review</strong>{generated.safetyFindings.map((finding)=><p className={finding.severity === 'info' ? 'tiny muted' : 'tiny danger'} key={`${finding.category}-${finding.message}`}>{finding.severity.toUpperCase()}: {finding.category} — {finding.message}</p>)}</div> : null}{generated.rollbackNotes && <p className="muted"><strong>Rollback:</strong> {generated.rollbackNotes}</p>}{generated.refinedPrompt && <p className="muted"><strong>Refined intent:</strong> {generated.refinedPrompt}</p>}{generated.implementationPlan?.length ? <ol className="muted">{generated.implementationPlan.map((step)=><li key={step}>{step}</li>)}</ol> : null}<p>{generated.explanation}</p>{generated.css && <pre className="code">{generated.css}</pre>}{generated.javascript && <pre className="code">{generated.javascript}</pre>}<button onClick={approve}>Approve & save</button></section>}
-    <section className="panel"><ModificationList modifications={mods} onToggle={(id,en)=>toggleModification(id,en).then(setMods)} onDelete={(id)=>deleteModification(id).then(setMods)} onSave={(mod)=>saveModification(mod).then(setMods)} onRegenerate={async (prompt)=>{ if (!consent) throw new Error('Confirm privacy consent in the side panel before regenerating.'); const page = contextForMode(context ?? await getPageContext(), contextMode, targetElement); setContext(page); return generate(prompt, page); }}/></section>
+    <section className="panel"><h2>{websiteLabel(activeUrl)} modifications</h2><p className="muted tiny">Showing only modifications matching the current website.</p><ModificationList modifications={siteMods} onToggle={(id,en)=>toggleModification(id,en).then(setMods)} onDelete={(id)=>deleteModification(id).then(setMods)} onSave={(mod)=>saveModification(mod).then(setMods)} onRegenerate={async (prompt)=>{ if (!consent) throw new Error('Confirm privacy consent in the side panel before regenerating.'); const page = contextForMode(context ?? await getPageContext(), contextMode, targetElement); setContext(page); return generate(prompt, page); }}/></section>
   </main>;
 }
 

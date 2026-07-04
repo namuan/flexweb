@@ -1,5 +1,6 @@
 import type { AppState, GeneratedModification, LibraryItem, Modification, PageContext, ProviderSettings, RuntimeMessage, SelectedElement } from '../shared/types';
 import { makeId } from '../shared/storage';
+import { anyPatternMatches } from '../shared/match';
 
 type Ok<T> = { ok: true } & T;
 
@@ -12,6 +13,20 @@ export async function send<T>(message: RuntimeMessage, tabId?: number): Promise<
 export async function getActiveTab(): Promise<chrome.tabs.Tab | undefined> {
   const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
   return tab;
+}
+
+export function modificationsForUrl(modifications: Modification[], url?: string): Modification[] {
+  if (!url || !/^(https?|file):/.test(url)) return [];
+  return modifications.filter((modification) => modification.matchPatterns.some((pattern) => anyPatternMatches(url, [pattern])));
+}
+
+export function websiteLabel(url?: string): string {
+  if (!url) return 'this website';
+  try {
+    return new URL(url).hostname || url;
+  } catch {
+    return url;
+  }
 }
 
 export async function getState(): Promise<{ state: AppState; library: LibraryItem[] }> {
