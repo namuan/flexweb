@@ -33,7 +33,7 @@ The MVP should prove the core loop:
 5. The modification persists and re-runs on future visits to matching pages.
 6. User can disable, edit, or delete the modification.
 
-Defer the public community library, extension exporter, billing, and advanced web search until the core customization workflow is stable.
+Public community library, extension exporting, billing, advanced web search, and broader assistant features are out of scope for the current plan.
 
 ## Architecture Overview
 
@@ -43,7 +43,7 @@ Defer the public community library, extension exporter, billing, and advanced we
 - **Side Panel UI**: Main AI chat and website customization workspace.
 - **Content Script**: Runs on webpages, inspects DOM, applies CSS/JS modifications, and reports page context back to the extension.
 - **Background Service Worker**: Coordinates messages, stores user settings, calls AI providers, and manages installed modifications.
-- **Options/Dashboard Page**: Manages API keys, privacy settings, installed modifications, library items, and export tools.
+- **Options/Dashboard Page**: Manages API keys, privacy settings, installed modifications, and built-in library items.
 
 ### Data Model
 
@@ -80,7 +80,7 @@ Defer the public community library, extension exporter, billing, and advanced we
 
 ## Prioritized Remaining Work
 
-The remaining work should be tackled in this order. UX polish and developer/project quality tasks are intentionally lower priority than MVP safety, privacy, runtime reliability, and core product capability.
+The remaining work should be tackled in this order. Product expansion, platform launch work, and lower-priority UX polish have been removed from scope for now.
 
 ### Priority 1: Safety and Runtime Reliability
 
@@ -98,34 +98,7 @@ The remaining work should be tackled in this order. UX polish and developer/proj
 - [x] Add in-product per-request privacy details before generation.
 - [x] Add privacy indicators showing exactly what context is sent.
 
-### Priority 3: Core Product Expansion
-
-- [ ] Add general chat UI in the side panel.
-- [ ] Support page-aware questions using approved page context.
-- [ ] Support selected-text actions such as summarize, rewrite, translate, and explain.
-- [ ] Add input-field writing improvement flow.
-- [ ] Improve built-in library coverage with Writing helpers and Fun/novelty categories.
-- [ ] Add parameterized templates for common requests.
-
-### Priority 4: Platform and Launch Readiness
-
-- [ ] Add packaged extension/zip build command.
-- [ ] Revisit manifest permissions for least-privilege host access before store submission.
-- [ ] Detect PDF viewer pages and define supported PDF behavior.
-- [ ] Create onboarding flow explaining permissions, privacy, and BYOK setup.
-- [ ] Prepare Chrome Web Store listing assets.
-- [ ] Review Chrome Web Store policy compliance.
-
-### Priority 5: Lower-Priority UX Polish
-
-- [ ] Add search and filter actions for modifications.
-- [ ] Add duplicate and export actions for modifications.
-- [ ] Add true diff preview against previous versions.
-- [ ] Add version history or restore previous generated versions.
-- [ ] Add dedicated per-site management view from popup or side panel.
-- [ ] Add library search and category browsing.
-
-### Priority 6: Developer and Project Quality
+### Priority 3: Developer and Project Quality
 
 - [ ] Add linting and formatting.
 - [ ] Add unit tests for storage, matching, provider adapters, and output validation.
@@ -144,9 +117,7 @@ The remaining work should be tackled in this order. UX polish and developer/proj
 - [x] Add type checking.
 - [ ] Add linting, formatting, and test tooling.
 - [x] Create development and production build commands.
-- [ ] Add packaged extension/zip build command.
 - [x] Define extension manifest permissions.
-- [ ] Revisit manifest permissions for least-privilege host access before store submission.
 - [x] Set up local loading instructions for Chrome/Chromium.
 - [x] Add GitHub publishing hygiene files and CI build workflow.
 
@@ -206,22 +177,17 @@ The remaining work should be tackled in this order. UX polish and developer/proj
 - [x] Block or warn on network exfiltration, credential access, destructive DOM actions, and broad page access.
 - [x] Prefer declarative CSS and narrowly scoped selectors where possible through prompting and target-element mode.
 - [x] Add a user-visible generated code preview before approval.
-- [ ] Add a true diff preview against previous versions.
 - [x] Store generated code locally by default.
 - [x] Add emergency disable-all control.
-- [ ] Add import/export format with warning labels for untrusted modifications.
 
-### Phase 7: Modification Management UI (Lower-Priority UX Polish)
+### Phase 7: Modification Management UI
 
 - [x] Build installed modifications list.
 - [x] Add enable, disable, edit, regenerate, and delete actions.
-- [ ] Add search and filter actions.
-- [ ] Add duplicate and export actions.
 - [x] Show each modification's target sites.
-- [ ] Show each modification's last run status.
+- [x] Show each modification's last run status.
 - [x] Add manual editing for advanced users.
-- [ ] Add version history or restore previous generated versions.
-- [ ] Add dedicated per-site management view from popup or side panel.
+- [x] Show only current-website modifications in popup, side panel, and options.
 
 ### Phase 8: Built-in Library
 
@@ -231,51 +197,18 @@ The remaining work should be tackled in this order. UX polish and developer/proj
   - Distraction blockers
   - Reading and accessibility
   - Design tweaks
-- [ ] Add remaining starter categories: Writing helpers and Fun/novelty.
 - [x] Implement install flow for built-in modifications.
-- [ ] Add parameterized templates for common requests, such as hiding elements or changing styles.
-- [ ] Add library search and category browsing.
 - [x] Defer public community publishing until moderation and trust systems are designed.
 
-### Phase 9: AI Sidebar Assistant
-
-- [ ] Add general chat UI in the side panel.
-- [ ] Support page-aware questions using approved page context.
-- [ ] Support selected-text actions such as summarize, rewrite, translate, and explain.
-- [ ] Add input-field writing improvement flow.
-- [ ] Let users insert AI-generated text back into focused inputs with confirmation.
-- [x] Add privacy indicators showing exactly what context is sent.
-- [x] Defer full web search until core chat and page context are stable.
-
-### Phase 10: PDFs and Non-Standard Pages
-
-- [x] Detect and report unsupported browser-restricted pages.
-- [ ] Detect PDF viewer pages.
-- [ ] Define which customization features work on PDFs.
-- [ ] Support sidebar chat over PDF text where accessible.
-- [x] Add clear unsupported-page messages for Chrome Web Store, internal browser pages, and restricted origins.
-- [x] Avoid promising modification support where extension APIs cannot operate.
-
-### Phase 11: Extension Exporter
-
-- [ ] Define export use cases: single modification, site pack, or standalone Chrome extension.
-- [ ] Generate a minimal Manifest V3 extension from selected modifications.
-- [ ] Include required manifest permissions and content scripts.
-- [ ] Add download as zip.
-- [ ] Add warnings about reviewing exported code before distribution.
-- [ ] Defer publishing automation to later versions.
-
-### Phase 12: Privacy, Settings, and Monetization Readiness
+### Phase 9: Privacy and Settings
 
 - [x] Implement BYOK API key setup and local Chrome extension storage strategy.
 - [x] Add no-history-by-default behavior for chats and page context.
-- [ ] Add optional local chat history setting.
 - [x] Add basic privacy copy for API keys and provider requests in README/options/security docs.
 - [x] Add in-product per-request privacy details before generation.
-- [ ] Add usage tracking for free daily credits if hosted AI is introduced.
 - [x] Design account, subscription, and billing integration only after MVP validation.
 
-### Phase 13: Testing and Quality Assurance (Later Developer/Project Quality)
+### Phase 10: Testing and Quality Assurance (Later Developer/Project Quality)
 
 - [ ] Add unit tests for storage, matching, provider adapters, and output validation.
 - [ ] Add integration tests for extension message passing.
@@ -283,18 +216,15 @@ The remaining work should be tackled in this order. UX polish and developer/proj
 - [ ] Test common SPA sites for route-change reapplication.
 - [ ] Test restricted pages and permission edge cases.
 - [ ] Add manual QA checklist for generated modification safety.
-- [ ] Test install, update, disable, delete, import, and export flows.
+- [ ] Test install, update, disable, delete, edit, regenerate, and emergency-disable flows.
 - [x] Add CI build verification with GitHub Actions.
 - [x] Verify current build locally with `npm run build`.
 
-### Phase 14: Launch Preparation
+### Phase 11: Documentation and Release Hygiene
 
-- [ ] Create onboarding flow explaining permissions, privacy, and BYOK setup.
 - [x] Add example prompts and starter templates.
 - [x] Add initial documentation for users and developers in `README.md`.
 - [x] Add `LICENSE` and `SECURITY.md`.
-- [ ] Prepare Chrome Web Store listing assets.
-- [ ] Review Chrome Web Store policy compliance.
 - [ ] Add error reporting strategy that does not collect page content by default.
 - [ ] Create release checklist and versioning process.
 
@@ -318,18 +248,12 @@ The remaining work should be tackled in this order. UX polish and developer/proj
 - Users see risk warnings before applying changes.
 - Modifications re-run reliably on modern dynamic websites.
 
-### Milestone 4: Library and Sidebar
+### Milestone 4: Stabilized MVP
 
-- Built-in library supports one-click install.
-- AI sidebar can answer questions about the current page with explicit context approval.
-- Writing assistant can improve selected text or focused input content.
-
-### Milestone 5: Beta-Ready Extension
-
-- Core workflows are tested.
-- Privacy settings are complete.
-- Onboarding and documentation are ready.
-- Extension package is ready for private beta distribution.
+- Core customization workflows are tested.
+- Privacy controls are complete.
+- Safety checks and emergency disable controls are complete.
+- Documentation is ready for repository users.
 
 ## Risks and Mitigations
 
